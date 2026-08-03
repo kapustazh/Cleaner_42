@@ -231,6 +231,21 @@ function clean {
 		[ "$v" != "$current_claude" ] && clean_glob "$v"
 	done
 
+	#Old Codex standalone releases (keep the one current points to)
+	current_codex=$(readlink -f "$HOME/.codex/packages/standalone/current" 2>/dev/null)
+	for v in "$HOME"/.codex/packages/standalone/releases/*; do
+		[ "$v" != "$current_codex" ] && clean_glob "$v"
+	done
+
+	#Old Cursor AppImages (keep the one ~/.local/bin/cursor launches)
+	current_cursor=$(grep -oE '[^"]*Cursor[^"]*\.AppImage' "$HOME/.local/bin/cursor" 2>/dev/null | head -1)
+	if [ -n "$current_cursor" ]; then
+		for img in "$HOME"/.local/bin/Cursor-*.AppImage; do
+			[ "$img" != "$current_cursor" ] && clean_glob "$img"
+		done
+	fi
+	clean_glob "$HOME"/.local/bin/Cursor-*.AppImage.part
+
 	echo -ne "\033[0m"
 }
 
