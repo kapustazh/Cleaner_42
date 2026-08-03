@@ -90,9 +90,18 @@ function clean {
 	#Package manager caches
 	clean_glob "$HOME"/.cache/pip/*
 	clean_glob "$HOME"/.npm/_cacache/*
+	clean_glob "$HOME"/.npm/_npx/*
+	clean_glob "$HOME"/.npm/_logs/*
 	clean_glob "$HOME"/.yarn/cache/*
 	clean_glob "$HOME"/.cargo/registry/cache/*
 	clean_glob "$HOME"/.gem/ruby/*/cache/*
+	clean_glob "$HOME"/.mypy_cache/*
+	clean_glob "$HOME"/.local/bin/.mypy_cache/*
+	clean_glob "$HOME"/.codex/.tmp/*
+	clean_glob "$HOME"/.codex/tmp/*
+	clean_glob "$HOME"/.codex/cache/*
+	clean_glob "$HOME"/.local/bin/*.AppImage.part
+	clean_glob "$HOME"/.fontconfig/*
 
 	#Browser Caches - Firefox
 	clean_glob "$HOME"/.var/app/org.mozilla.firefox/cache/*
@@ -103,6 +112,17 @@ function clean {
 
 
 
+	#Browser Caches - Chrome/Chromium (native)
+	clean_glob "$HOME"/.config/google-chrome/Default/Cache/*
+	clean_glob "$HOME"/.config/google-chrome/Default/Code\ Cache/*
+	clean_glob "$HOME"/.config/google-chrome/Default/Service\ Worker/CacheStorage/*
+	clean_glob "$HOME"/.config/google-chrome/Default/GPUCache/*
+	clean_glob "$HOME"/.config/google-chrome/ShaderCache/*
+	clean_glob "$HOME"/.config/google-chrome/GraphiteDawnCache/*
+	clean_glob "$HOME"/.config/google-chrome/GrShaderCache/*
+	clean_glob "$HOME"/.config/google-chrome/component_crx_cache/*
+	clean_glob "$HOME"/.config/google-chrome/optimization_guide_model_store/*
+
 	#Browser Caches - Chrome/Chromium
 	clean_glob "$HOME"/.cache/google-chrome/Default/Cache/*
 	clean_glob "$HOME"/.var/app/com.google.Chrome/cache/*
@@ -112,6 +132,15 @@ function clean {
 	clean_glob "$HOME"/.var/app/com.google.Chrome/config/google-chrome/Profile\ [0-9]/Service\ Worker/CacheStorage/*
 	clean_glob "$HOME"/.var/app/com.google.Chrome/config/google-chrome/Profile\ [0-9]/Application\ Cache/*
 	clean_glob "$HOME"/.var/app/com.google.Chrome/config/google-chrome/Profile\ [0-9]/File\ System
+
+	#Browser Caches - Brave (native)
+	clean_glob "$HOME"/.config/BraveSoftware/Brave-Browser/Default/Cache/*
+	clean_glob "$HOME"/.config/BraveSoftware/Brave-Browser/Default/Code\ Cache/*
+	clean_glob "$HOME"/.config/BraveSoftware/Brave-Browser/Default/Service\ Worker/CacheStorage/*
+	clean_glob "$HOME"/.config/BraveSoftware/Brave-Browser/Default/GPUCache/*
+	clean_glob "$HOME"/.config/BraveSoftware/Brave-Browser/ShaderCache/*
+	clean_glob "$HOME"/.config/BraveSoftware/Brave-Browser/GraphiteDawnCache/*
+	clean_glob "$HOME"/.config/BraveSoftware/Brave-Browser/GrShaderCache/*
 
 	#Browser Caches - Brave
 	clean_glob "$HOME"/.var/app/com.brave.Browser/cache/*
@@ -131,6 +160,32 @@ function clean {
 	clean_glob "$HOME"/.var/app/com.visualstudio.code/config/Code/User/workspaceStorage/*
 	clean_glob "$HOME"/.var/app/com.visualstudio.code/config/Code/Crashpad/completed/*
 	clean_glob "$HOME"/.vscode/extensions/*/node_modules/*
+
+	#VS Code (native) caches
+	clean_glob "$HOME"/.config/Code/Cache/*
+	clean_glob "$HOME"/.config/Code/CachedData/*
+	clean_glob "$HOME"/.config/Code/CachedExtensionVSIXs/*
+	clean_glob "$HOME"/.config/Code/GPUCache/*
+	clean_glob "$HOME"/.config/Code/Code\ Cache/*
+	clean_glob "$HOME"/.config/Code/Crashpad/completed/*
+	clean_glob "$HOME"/.config/Code/logs/*
+	clean_glob "$HOME"/.config/Code/User/workspaceStorage/*
+	clean_glob "$HOME"/.config/Code.backup
+
+	#Cursor caches (keeps AppImage + extensions)
+	clean_glob "$HOME"/.config/Cursor/Cache/*
+	clean_glob "$HOME"/.config/Cursor/CachedData/*
+	clean_glob "$HOME"/.config/Cursor/CachedExtensionVSIXs/*
+	clean_glob "$HOME"/.config/Cursor/GPUCache/*
+	clean_glob "$HOME"/.config/Cursor/Code\ Cache/*
+	clean_glob "$HOME"/.config/Cursor/Crashpad/completed/*
+	clean_glob "$HOME"/.config/Cursor/logs/*
+	clean_glob "$HOME"/.config/Cursor/WebStorage/*
+	clean_glob "$HOME"/.config/Cursor/User/globalStorage/anysphere.cursor-agent-worker/*
+	clean_glob "$HOME"/.config/Cursor/User/workspaceStorage/*
+	clean_glob "$HOME"/.config/Cursor/User/History/*
+	clean_glob "$HOME"/.cursor/projects/*
+
 	clean_glob "$HOME"/.var/app/com.discordapp.Discord/cache/*
 	clean_glob "$HOME"/.var/app/com.discordapp.Discord/config/discord/Cache/*
  	clean_glob "$HOME"/.var/app/com.discordapp.Discord/config/discord/Code\ Cache/js*
@@ -141,6 +196,14 @@ function clean {
 	clean_glob "$HOME"/.var/app/com.slack.Slack/config/Slack/Cache/*
 	clean_glob "$HOME"/.var/app/com.slack.Slack/config/Slack/Service\ Worker/CacheStorage/*
 	clean_glob "$HOME"/.var/app/com.slack.Slack/config/Slack/Crashpad/completed/*
+
+	#Slack (native) caches
+	clean_glob "$HOME"/.config/Slack/Cache/*
+	clean_glob "$HOME"/.config/Slack/Service\ Worker/*
+	clean_glob "$HOME"/.config/Slack/Code\ Cache/*
+	clean_glob "$HOME"/.config/Slack/GPUCache/*
+	clean_glob "$HOME"/.config/Slack/logs/*
+
     clean_glob "$HOME"/.var/app/com.spotify.Client/cache/*
     clean_glob "$HOME"/.var/app/com.spotify.Client/config/spotify/PersistentCache/*
 
@@ -161,6 +224,12 @@ function clean {
 
     # Docker user caches
     clean_glob "$HOME"/.docker/*/cache/*
+
+	#Old Claude Code versions (keep the one ~/.local/bin/claude points to)
+	current_claude=$(readlink -f "$HOME/.local/bin/claude" 2>/dev/null)
+	for v in "$HOME"/.local/share/claude/versions/*; do
+		[ "$v" != "$current_claude" ] && clean_glob "$v"
+	done
 
 	echo -ne "\033[0m"
 }
