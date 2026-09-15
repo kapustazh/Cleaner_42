@@ -100,6 +100,9 @@ function clean {
 	clean_glob "$HOME"/.codex/.tmp/*
 	clean_glob "$HOME"/.codex/tmp/*
 	clean_glob "$HOME"/.codex/cache/*
+	clean_glob "$HOME"/.codex/shell_snapshots/*
+	clean_glob "$HOME"/.codex/models_cache.json
+	clean_glob "$HOME"/.codex/plugins/.remote-plugin-install-staging/*
 	clean_glob "$HOME"/.local/bin/*.AppImage.part
 	clean_glob "$HOME"/.fontconfig/*
 
