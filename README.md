@@ -24,6 +24,8 @@ Options:
 
 `-p`, `--print`: print file paths as they are cleaned by the script
 
+`--dry-run`: print file paths and sizes without deleting them
+
 ## How to update ?
 
 1. First : Run this command `cclean update`

@@ -16,7 +16,7 @@ sleep 2
 if [ "$1" == "update" ];
 then
 	tmp_dir=".4yarha"
-	if ! git clone --quiet https://github.com/ombhd/Cleaner_42.git "$HOME"/"$tmp_dir" &>/dev/null;
+	if ! git clone --quiet https://github.com/kapustazh/Cleaner_42.git "$HOME"/"$tmp_dir" &>/dev/null;
 	then
 		sleep 0.5
 		echo -e "\033[31m\n           -- Couldn't update CCLEAN! :( --\033[0m"
@@ -24,7 +24,7 @@ then
 		exit 1
 	fi
 	sleep 1
-	if [ "" == "$(diff "$HOME"/Linux_Cleaner_42.sh "$HOME"/"$tmp_dir"/Linux_Cleaner_42.sh)" ];
+	if cmp -s "$HOME"/LinuxCleaner_42.sh "$HOME"/"$tmp_dir"/LinuxCleaner_42.sh;
 	then
 		echo -e "\033[33m\n -- You already have the latest version of cclean --\n\033[0m"
 		/bin/rm -rf "$HOME"/"${tmp_dir:?}"
@@ -47,8 +47,12 @@ echo -e "\033[33m\n -- Available Storage Before Cleaning : || $Storage || --\033
 echo -e "\033[31m\n -- Cleaning ...\n\033[0m "
 
 should_log=0
+dry_run=0
 if [[ "$1" == "-p" || "$1" == "--print" ]]; then
 	should_log=1
+elif [ "$1" == "--dry-run" ]; then
+	should_log=1
+	dry_run=1
 fi
 
 function clean_glob {
@@ -63,6 +67,7 @@ function clean_glob {
 		done
 	fi
 
+	[ $dry_run -eq 1 ] && return 0
 	/bin/rm -rf "$@" &>/dev/null
 
 	return 0
@@ -104,7 +109,13 @@ function clean {
 	clean_glob "$HOME"/.codex/models_cache.json
 	clean_glob "$HOME"/.codex/plugins/.remote-plugin-install-staging/*
 	clean_glob "$HOME"/.local/bin/*.AppImage.part
+	clean_glob "$HOME"/.local/bin/agy.*.old
 	clean_glob "$HOME"/.fontconfig/*
+
+	# Steam update staging (only while Steam is closed)
+	if ! pgrep -x steam >/dev/null 2>&1; then
+		clean_glob "$HOME"/.local/share/Steam/package/tmp
+	fi
 
 	#Browser Caches - Firefox
 	clean_glob "$HOME"/.var/app/org.mozilla.firefox/cache/*
@@ -162,12 +173,12 @@ function clean {
 	clean_glob "$HOME"/.var/app/com.visualstudio.code/config/Code/CachedData/*
 	clean_glob "$HOME"/.var/app/com.visualstudio.code/config/Code/User/workspaceStorage/*
 	clean_glob "$HOME"/.var/app/com.visualstudio.code/config/Code/Crashpad/completed/*
-	clean_glob "$HOME"/.vscode/extensions/*/node_modules/*
 
 	#VS Code (native) caches
 	clean_glob "$HOME"/.config/Code/Cache/*
 	clean_glob "$HOME"/.config/Code/CachedData/*
 	clean_glob "$HOME"/.config/Code/CachedExtensionVSIXs/*
+	clean_glob "$HOME"/.config/Code/CachedExtensionVSIXs/.trash
 	clean_glob "$HOME"/.config/Code/GPUCache/*
 	clean_glob "$HOME"/.config/Code/Code\ Cache/*
 	clean_glob "$HOME"/.config/Code/Crashpad/completed/*
@@ -217,10 +228,6 @@ function clean {
 	clean_glob "$HOME"/.cache/thumbnails/*
 	clean_glob "$HOME"/.thumbnails/*
 
-	#Temporary files
- 	find /tmp -type f -user "$USER" -exec rm -f {} \; 2>/dev/null
-
-
 	#Things related to pool (piscine)
 	clean_glob "$HOME"/Desktop/Piscine\ Rules\ *.mp4
 	clean_glob "$HOME"/Desktop/PLAY_ME.webloc
@@ -247,7 +254,14 @@ function clean {
 			[ "$img" != "$current_cursor" ] && clean_glob "$img"
 		done
 	fi
+	clean_glob "$HOME"/.local/bin/Cursor-*.AppImage.zs-old
 	clean_glob "$HOME"/.local/bin/Cursor-*.AppImage.part
+	if [ -x "$HOME/.local/bin/cursor-agent" ]; then
+		current_cursor_agent_dir=$(dirname "$(readlink -f "$HOME/.local/bin/cursor-agent")")
+		for v in "$HOME"/.local/share/cursor-agent/versions/*; do
+			[ "$v" != "$current_cursor_agent_dir" ] && clean_glob "$v"
+		done
+	fi
 
 	echo -ne "\033[0m"
 }
